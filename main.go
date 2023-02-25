@@ -5,10 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/cavaliergopher/grab/v3"
 	"github.com/hajimehoshi/go-mp3"
 	"github.com/hajimehoshi/oto/v2"
 	"github.com/joho/godotenv"
+	"github.com/melbahja/got"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 	"log"
@@ -30,12 +30,11 @@ func main() {
 		log.Fatalf("Error creating new YouTube client: %v", err)
 	}
 
-	searchResult, title, err := searchVideo(ctx, youtubeService, "hey mambo")
-	link, size, err := getAudioLink(searchResult.Id.VideoId)
+	searchResult, title, err := searchVideo(ctx, youtubeService, "мукка")
+	link, err := getAudioLink(searchResult.Id.VideoId)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("size is", size)
 	err = downloadAudio(link, title)
 	if err != nil {
 		fmt.Println(err)
@@ -45,10 +44,10 @@ func main() {
 }
 
 func downloadAudio(link, title string) error {
-	fmt.Println("link is", link)
 	fmt.Println("I download")
-	resp, err := grab.Get(".", link)
-	os.Rename(resp.Filename, title+".mp3")
+	g := got.New()
+	var err error
+	err = g.Download(link, "./"+title+".mp3")
 	fmt.Println("I downloaded")
 	return err
 }
@@ -57,7 +56,9 @@ func searchVideo(ctx context.Context, youtubeService *youtube.Service, query str
 	searchCall := youtubeService.Search.List([]string{"snippet", "id"}).
 		Q(query).
 		Order("relevance").
+		Order("rating").
 		Type("video").
+		VideoDuration("short").
 		MaxResults(1)
 	searchResult, err := searchCall.Do()
 	if err != nil {
@@ -70,33 +71,32 @@ func searchVideo(ctx context.Context, youtubeService *youtube.Service, query str
 	return searchResult.Items[0], title, nil
 }
 
-func getAudioLink(videoId string) (link, size string, err error) {
+func getAudioLink(videoId string) (link string, err error) {
 	url := os.Getenv("VEVIOZ_API") + videoId
 	// Request the HTML page.
 	res, err := http.Get(url)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return "", "", fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
+		return "", fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 
 	// Parse
 	str := doc.Find("a")
 	str.Each(func(i int, s *goquery.Selection) {
 		if i == 2 {
-			size = s.Find("div.text-shadow-1").Next().Text()
 			link, _ = s.Attr("href")
 		}
 	})
-	return link, size, nil
+	return link, nil
 }
 
 func playAudio(filename string) {
