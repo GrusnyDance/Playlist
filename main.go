@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/cavaliergopher/grab/v3"
+	"github.com/hajimehoshi/go-mp3"
+	"github.com/hajimehoshi/oto/v2"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -27,7 +30,7 @@ func main() {
 		log.Fatalf("Error creating new YouTube client: %v", err)
 	}
 
-	searchResult, title, err := searchVideo(ctx, youtubeService, "lalala")
+	searchResult, title, err := searchVideo(ctx, youtubeService, "hey mambo")
 	link, size, err := getAudioLink(searchResult.Id.VideoId)
 	if err != nil {
 		fmt.Println(err)
@@ -37,17 +40,23 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	playAudio(title)
 }
 
 func downloadAudio(link, title string) error {
+	fmt.Println("link is", link)
+	fmt.Println("I download")
 	resp, err := grab.Get(".", link)
 	os.Rename(resp.Filename, title+".mp3")
+	fmt.Println("I downloaded")
 	return err
 }
 
 func searchVideo(ctx context.Context, youtubeService *youtube.Service, query string) (*youtube.SearchResult, string, error) {
 	searchCall := youtubeService.Search.List([]string{"snippet", "id"}).
 		Q(query).
+		Order("relevance").
 		Type("video").
 		MaxResults(1)
 	searchResult, err := searchCall.Do()
@@ -88,4 +97,46 @@ func getAudioLink(videoId string) (link, size string, err error) {
 		}
 	})
 	return link, size, nil
+}
+
+func playAudio(filename string) {
+	data, e1 := os.Open(filename + ".mp3")
+	defer data.Close()
+
+	if e1 != nil {
+		log.Fatalln(e1.Error())
+	}
+	decodedStream, e2 := mp3.NewDecoder(data)
+	if e2 != nil {
+		log.Fatalln(e2.Error())
+	}
+	otoCtx, readyChan, e3 := oto.NewContext(44100, 2, 2)
+	if e3 != nil {
+		log.Fatalln(e3.Error())
+	}
+	//ждем завершения инициализации
+	<-readyChan
+	player := otoCtx.NewPlayer(decodedStream)
+
+	// Play starts playing the sound and returns without waiting for it (Play() is async).
+	player.Play()
+
+	// We can wait for the sound to finish playing using something like this
+	for player.IsPlaying() {
+		time.Sleep(time.Millisecond)
+	}
+
+	// Now that the sound finished playing, we can restart from the beginning (or go to any location in the sound) using seek
+	// newPos, err := player.(io.Seeker).Seek(0, io.SeekStart)
+	// if err != nil{
+	//     panic("player.Seek failed: " + err.Error())
+	// }
+	// println("Player is now at position:", newPos)
+	// player.Play()
+
+	// If you don't want the player/sound anymore simply close
+	err := player.Close()
+	if err != nil {
+		panic("player.Close failed: " + err.Error())
+	}
 }
