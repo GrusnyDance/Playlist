@@ -19,6 +19,7 @@ func main() {
 	defer conn.Close()
 
 	client := pb.NewPlaylistClient(conn)
+
 	sn := &pb.SongName{
 		Name: "перезаряжай",
 	}

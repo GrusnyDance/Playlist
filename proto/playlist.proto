@@ -1,18 +1,19 @@
 syntax = "proto3";
 option go_package="./.;pb";
 package pb;
+import "google/protobuf/empty.proto";
 
 service Playlist {
-  rpc Play(Empty) returns (stream Audio);
-  rpc Pause(Empty) returns (PauseStatus);
+  rpc Play(google.protobuf.Empty) returns (stream Audio);
+  rpc Pause(google.protobuf.Empty) returns (PauseStatus);
   rpc AddSong(SongName) returns (AddStatus);
-  rpc Next(Empty) returns (NextStatus);
-  rpc Prev(Empty) returns (PrevStatus);
+  rpc Next(google.protobuf.Empty) returns (NextStatus);
+  rpc Prev(google.protobuf.Empty) returns (PrevStatus);
 }
 
-message Empty {
-
-}
+//message Empty {
+//
+//}
 
 message Audio {
   repeated bytes AudioChunk = 1;

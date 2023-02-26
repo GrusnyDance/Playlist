@@ -16,7 +16,7 @@ import (
 	"playlist/duration"
 )
 
-func main() {
+func haha() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)

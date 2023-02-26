@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,11 +23,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlaylistClient interface {
-	Play(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Playlist_PlayClient, error)
-	Pause(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PauseStatus, error)
+	Play(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (Playlist_PlayClient, error)
+	Pause(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PauseStatus, error)
 	AddSong(ctx context.Context, in *SongName, opts ...grpc.CallOption) (*AddStatus, error)
-	Next(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*NextStatus, error)
-	Prev(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PrevStatus, error)
+	Next(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*NextStatus, error)
+	Prev(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PrevStatus, error)
 }
 
 type playlistClient struct {
@@ -37,7 +38,7 @@ func NewPlaylistClient(cc grpc.ClientConnInterface) PlaylistClient {
 	return &playlistClient{cc}
 }
 
-func (c *playlistClient) Play(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Playlist_PlayClient, error) {
+func (c *playlistClient) Play(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (Playlist_PlayClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Playlist_ServiceDesc.Streams[0], "/pb.Playlist/Play", opts...)
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (x *playlistPlayClient) Recv() (*Audio, error) {
 	return m, nil
 }
 
-func (c *playlistClient) Pause(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PauseStatus, error) {
+func (c *playlistClient) Pause(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PauseStatus, error) {
 	out := new(PauseStatus)
 	err := c.cc.Invoke(ctx, "/pb.Playlist/Pause", in, out, opts...)
 	if err != nil {
@@ -87,7 +88,7 @@ func (c *playlistClient) AddSong(ctx context.Context, in *SongName, opts ...grpc
 	return out, nil
 }
 
-func (c *playlistClient) Next(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*NextStatus, error) {
+func (c *playlistClient) Next(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*NextStatus, error) {
 	out := new(NextStatus)
 	err := c.cc.Invoke(ctx, "/pb.Playlist/Next", in, out, opts...)
 	if err != nil {
@@ -96,7 +97,7 @@ func (c *playlistClient) Next(ctx context.Context, in *Empty, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *playlistClient) Prev(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PrevStatus, error) {
+func (c *playlistClient) Prev(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PrevStatus, error) {
 	out := new(PrevStatus)
 	err := c.cc.Invoke(ctx, "/pb.Playlist/Prev", in, out, opts...)
 	if err != nil {
@@ -109,11 +110,11 @@ func (c *playlistClient) Prev(ctx context.Context, in *Empty, opts ...grpc.CallO
 // All implementations must embed UnimplementedPlaylistServer
 // for forward compatibility
 type PlaylistServer interface {
-	Play(*Empty, Playlist_PlayServer) error
-	Pause(context.Context, *Empty) (*PauseStatus, error)
+	Play(*emptypb.Empty, Playlist_PlayServer) error
+	Pause(context.Context, *emptypb.Empty) (*PauseStatus, error)
 	AddSong(context.Context, *SongName) (*AddStatus, error)
-	Next(context.Context, *Empty) (*NextStatus, error)
-	Prev(context.Context, *Empty) (*PrevStatus, error)
+	Next(context.Context, *emptypb.Empty) (*NextStatus, error)
+	Prev(context.Context, *emptypb.Empty) (*PrevStatus, error)
 	mustEmbedUnimplementedPlaylistServer()
 }
 
@@ -121,19 +122,19 @@ type PlaylistServer interface {
 type UnimplementedPlaylistServer struct {
 }
 
-func (UnimplementedPlaylistServer) Play(*Empty, Playlist_PlayServer) error {
+func (UnimplementedPlaylistServer) Play(*emptypb.Empty, Playlist_PlayServer) error {
 	return status.Errorf(codes.Unimplemented, "method Play not implemented")
 }
-func (UnimplementedPlaylistServer) Pause(context.Context, *Empty) (*PauseStatus, error) {
+func (UnimplementedPlaylistServer) Pause(context.Context, *emptypb.Empty) (*PauseStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pause not implemented")
 }
 func (UnimplementedPlaylistServer) AddSong(context.Context, *SongName) (*AddStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddSong not implemented")
 }
-func (UnimplementedPlaylistServer) Next(context.Context, *Empty) (*NextStatus, error) {
+func (UnimplementedPlaylistServer) Next(context.Context, *emptypb.Empty) (*NextStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Next not implemented")
 }
-func (UnimplementedPlaylistServer) Prev(context.Context, *Empty) (*PrevStatus, error) {
+func (UnimplementedPlaylistServer) Prev(context.Context, *emptypb.Empty) (*PrevStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Prev not implemented")
 }
 func (UnimplementedPlaylistServer) mustEmbedUnimplementedPlaylistServer() {}
@@ -150,7 +151,7 @@ func RegisterPlaylistServer(s grpc.ServiceRegistrar, srv PlaylistServer) {
 }
 
 func _Playlist_Play_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Empty)
+	m := new(emptypb.Empty)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -171,7 +172,7 @@ func (x *playlistPlayServer) Send(m *Audio) error {
 }
 
 func _Playlist_Pause_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -183,7 +184,7 @@ func _Playlist_Pause_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: "/pb.Playlist/Pause",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlaylistServer).Pause(ctx, req.(*Empty))
+		return srv.(PlaylistServer).Pause(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -207,7 +208,7 @@ func _Playlist_AddSong_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Playlist_Next_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -219,13 +220,13 @@ func _Playlist_Next_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/pb.Playlist/Next",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlaylistServer).Next(ctx, req.(*Empty))
+		return srv.(PlaylistServer).Next(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Playlist_Prev_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -237,7 +238,7 @@ func _Playlist_Prev_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/pb.Playlist/Prev",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlaylistServer).Prev(ctx, req.(*Empty))
+		return srv.(PlaylistServer).Prev(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
