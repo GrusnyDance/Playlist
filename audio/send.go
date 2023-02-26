@@ -6,10 +6,9 @@ import (
 	"github.com/hajimehoshi/oto"
 	"io"
 	"os"
-	"time"
 )
 
-func Get(filename string) {
+func Send(filename string) {
 	const chunkSize = 4096
 
 	// Open the MP3 file
@@ -50,9 +49,6 @@ func Get(filename string) {
 			panic(err)
 		}
 
-		// Sleep to simulate audio transport delay
-		time.Sleep(5 * time.Millisecond)
-		// Calculate the percentage of the file that has been played
 		offset, _ := mp3Decoder.Seek(0, io.SeekCurrent)
 		fmt.Println("current offset", offset)
 	}

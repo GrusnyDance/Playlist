@@ -1,19 +1,41 @@
 syntax = "proto3";
-option go_package="./.";
-package proto;
+option go_package="./.;pb";
+package pb;
 
-service Reverse {
-  rpc Play() returns (stream Audio);
-  rpc Pause() returns (PauseStatus);
+service Playlist {
+  rpc Play(Empty) returns (stream Audio);
+  rpc Pause(Empty) returns (PauseStatus);
   rpc AddSong(SongName) returns (AddStatus);
-  rpc Next() returns (NextStatus);
-  rpc Prev() returns (PrevStatus);
+  rpc Next(Empty) returns (NextStatus);
+  rpc Prev(Empty) returns (PrevStatus);
 }
 
-message Request {
-  string message = 1;
+message Empty {
+
 }
 
-message Response {
-  string message = 1;
+message Audio {
+  repeated bytes AudioChunk = 1;
+  uint64 ChunkSize = 2;
+  string Error = 3;
+}
+
+message PauseStatus {
+  string Error = 1;
+}
+
+message SongName {
+  string Name = 1;
+}
+
+message AddStatus {
+  string Error = 1;
+}
+
+message NextStatus {
+  string Error = 1;
+}
+
+message PrevStatus {
+  string Error = 1;
 }
