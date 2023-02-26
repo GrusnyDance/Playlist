@@ -1,0 +1,19 @@
+syntax = "proto3";
+option go_package="./.";
+package proto;
+
+service Reverse {
+  rpc Play() returns (stream Audio);
+  rpc Pause() returns (PauseStatus);
+  rpc AddSong(SongName) returns (AddStatus);
+  rpc Next() returns (NextStatus);
+  rpc Prev() returns (PrevStatus);
+}
+
+message Request {
+  string message = 1;
+}
+
+message Response {
+  string message = 1;
+}

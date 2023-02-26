@@ -1,1 +1,5 @@
 apt install libasound2-dev
+protoc proto/*.proto --go-grpc_out=proto/ --go_out=proto/
+apt install -y protobuf-compiler
+sudo apt install libswscale-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev
+apt-get install portaudio19-dev

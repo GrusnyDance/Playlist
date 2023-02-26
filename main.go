@@ -5,18 +5,15 @@ import (
 	"flag"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/hajimehoshi/go-mp3"
-	"github.com/hajimehoshi/oto/v2"
 	"github.com/joho/godotenv"
 	"github.com/levigross/grequests"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
-	"io"
 	"log"
 	"net/http"
 	"os"
+	"playlist/audio"
 	"playlist/duration"
-	"time"
 )
 
 func main() {
@@ -32,7 +29,7 @@ func main() {
 		log.Fatalf("Error creating new YouTube client: %v", err)
 	}
 
-	searchResult, title, err := searchVideo(ctx, youtubeService, "my baby")
+	searchResult, title, err := searchVideo(ctx, youtubeService, "перезаряжай")
 	dur, err := duration.GetDuration(searchResult.Id.VideoId)
 	if err != nil {
 		fmt.Println(err)
@@ -48,7 +45,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	playAudio(title)
+	audio.Get(title + ".mp3")
 }
 
 func downloadAudio(link, title string) error {
@@ -72,7 +69,7 @@ func downloadAudio(link, title string) error {
 }
 
 func searchVideo(ctx context.Context, youtubeService *youtube.Service, query string) (*youtube.SearchResult, string, error) {
-	searchCall := youtubeService.Search.List([]string{"snippet", "id"}).
+	searchCall := youtubeService.Search.List("snippet").
 		Q(query).
 		Order("relevance").
 		Order("viewCount").
@@ -118,49 +115,4 @@ func getAudioLink(videoId string) (link string, err error) {
 	})
 	fmt.Println("link is", link)
 	return link, nil
-}
-
-func playAudio(filename string) {
-	data, e1 := os.Open(filename + ".mp3")
-	defer data.Close()
-
-	if e1 != nil {
-		log.Fatalln(e1.Error())
-	}
-	decodedStream, e2 := mp3.NewDecoder(data)
-	if e2 != nil {
-		log.Fatalln(e2.Error())
-	}
-	otoCtx, readyChan, e3 := oto.NewContext(44100, 2, 2)
-	if e3 != nil {
-		log.Fatalln(e3.Error())
-	}
-	//ждем завершения инициализации
-	<-readyChan
-	player := otoCtx.NewPlayer(decodedStream)
-	newPos, err := player.(io.Seeker).Seek(0, io.SeekCurrent)
-	fmt.Println("newPos 1 is", newPos)
-
-	// Play starts playing the sound and returns without waiting for it (Play() is async).
-	player.Play()
-
-	// We can wait for the sound to finish playing using something like this
-	//for player.IsPlaying() {
-	//	time.Sleep(time.Millisecond)
-	//}
-
-	time.Sleep(time.Minute * 1)
-	player.Pause()
-	time.Sleep(time.Second * 10)
-	player.Play()
-	time.Sleep(time.Minute * 1)
-
-	newPos2, err := player.(io.Seeker).Seek(0, io.SeekCurrent)
-	fmt.Println("newPos 2 is", newPos2)
-
-	// If you don't want the player/sound anymore simply close
-	err = player.Close()
-	if err != nil {
-		panic("player.Close failed: " + err.Error())
-	}
 }

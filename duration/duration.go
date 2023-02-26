@@ -2,7 +2,6 @@ package duration
 
 import (
 	"encoding/json"
-	"fmt"
 	duration "github.com/channelmeter/iso8601duration"
 	"github.com/levigross/grequests"
 	"os"
@@ -45,8 +44,6 @@ func GetDuration(videoId string) (int, error) {
 		return 0, err
 	}
 
-	fmt.Println(videoTags.Items[0].ContentDetails.Duration)
 	dur, _ := duration.FromString(videoTags.Items[0].ContentDetails.Duration)
-	fmt.Println(dur)
 	return dur.Minutes*60 + dur.Seconds, nil
 }
