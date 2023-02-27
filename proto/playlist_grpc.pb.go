@@ -26,6 +26,7 @@ type PlaylistClient interface {
 	Play(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (Playlist_PlayClient, error)
 	Pause(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PauseStatus, error)
 	AddSong(ctx context.Context, in *SongName, opts ...grpc.CallOption) (*AddStatus, error)
+	DeleteSong(ctx context.Context, in *SongName, opts ...grpc.CallOption) (*DeleteStatus, error)
 	Next(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*NextStatus, error)
 	Prev(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PrevStatus, error)
 }
@@ -88,6 +89,15 @@ func (c *playlistClient) AddSong(ctx context.Context, in *SongName, opts ...grpc
 	return out, nil
 }
 
+func (c *playlistClient) DeleteSong(ctx context.Context, in *SongName, opts ...grpc.CallOption) (*DeleteStatus, error) {
+	out := new(DeleteStatus)
+	err := c.cc.Invoke(ctx, "/pb.Playlist/DeleteSong", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *playlistClient) Next(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*NextStatus, error) {
 	out := new(NextStatus)
 	err := c.cc.Invoke(ctx, "/pb.Playlist/Next", in, out, opts...)
@@ -113,6 +123,7 @@ type PlaylistServer interface {
 	Play(*emptypb.Empty, Playlist_PlayServer) error
 	Pause(context.Context, *emptypb.Empty) (*PauseStatus, error)
 	AddSong(context.Context, *SongName) (*AddStatus, error)
+	DeleteSong(context.Context, *SongName) (*DeleteStatus, error)
 	Next(context.Context, *emptypb.Empty) (*NextStatus, error)
 	Prev(context.Context, *emptypb.Empty) (*PrevStatus, error)
 	mustEmbedUnimplementedPlaylistServer()
@@ -130,6 +141,9 @@ func (UnimplementedPlaylistServer) Pause(context.Context, *emptypb.Empty) (*Paus
 }
 func (UnimplementedPlaylistServer) AddSong(context.Context, *SongName) (*AddStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddSong not implemented")
+}
+func (UnimplementedPlaylistServer) DeleteSong(context.Context, *SongName) (*DeleteStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSong not implemented")
 }
 func (UnimplementedPlaylistServer) Next(context.Context, *emptypb.Empty) (*NextStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Next not implemented")
@@ -207,6 +221,24 @@ func _Playlist_AddSong_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Playlist_DeleteSong_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SongName)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlaylistServer).DeleteSong(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Playlist/DeleteSong",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlaylistServer).DeleteSong(ctx, req.(*SongName))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Playlist_Next_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -257,6 +289,10 @@ var Playlist_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddSong",
 			Handler:    _Playlist_AddSong_Handler,
+		},
+		{
+			MethodName: "DeleteSong",
+			Handler:    _Playlist_DeleteSong_Handler,
 		},
 		{
 			MethodName: "Next",

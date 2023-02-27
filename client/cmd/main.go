@@ -20,6 +20,17 @@ func main() {
 
 	client := pb.NewPlaylistClient(conn)
 
+	//// usecase 1
+	//sn := &pb.SongName{
+	//	Name: "перезаряжай",
+	//}
+	//response, err := client.AddSong(context.Background(), sn)
+	//if err != nil {
+	//	grpclog.Fatalf("fail to dial: %v", err)
+	//}
+	//// usecase 1
+
+	// usecase 2
 	sn := &pb.SongName{
 		Name: "перезаряжай",
 	}
@@ -27,6 +38,7 @@ func main() {
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
 	}
+	// usecase 2
 
 	fmt.Println(response.Error, "error is")
 }

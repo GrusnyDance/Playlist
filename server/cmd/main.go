@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	"net"
@@ -9,6 +11,12 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		grpclog.Fatal(err)
+	}
+	flag.Parse()
+
 	listener, err := net.Listen("tcp", "localhost:9999")
 
 	if err != nil {
@@ -16,7 +24,10 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	svr := crud.NewServer()
+	svr, err := crud.NewServer()
+	if err != nil {
+		grpclog.Fatal(err)
+	}
 	pb.RegisterPlaylistServer(grpcServer, svr)
 	grpcServer.Serve(listener)
 }

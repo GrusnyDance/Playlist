@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"os"
 	"playlist/audio"
-	"playlist/duration"
+	"playlist/server/internal/duration"
 )
 
 func haha() {

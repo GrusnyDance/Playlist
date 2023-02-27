@@ -4,4 +4,4 @@ apt install -y protobuf-compiler
 sudo apt install libswscale-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev
 apt-get install portaudio19-dev
 go run client/cmd/main.go
- go run server/cmd/main.go
+go run server/cmd/main.go

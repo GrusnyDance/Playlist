@@ -7,6 +7,7 @@ service Playlist {
   rpc Play(google.protobuf.Empty) returns (stream Audio);
   rpc Pause(google.protobuf.Empty) returns (PauseStatus);
   rpc AddSong(SongName) returns (AddStatus);
+  rpc DeleteSong(SongName) returns (DeleteStatus);
   rpc Next(google.protobuf.Empty) returns (NextStatus);
   rpc Prev(google.protobuf.Empty) returns (PrevStatus);
 }
@@ -16,8 +17,8 @@ service Playlist {
 //}
 
 message Audio {
-  repeated bytes AudioChunk = 1;
-  uint64 ChunkSize = 2;
+  bytes AudioChunk = 1;
+  int32 ChunkSize = 2;
   string Error = 3;
 }
 
@@ -30,6 +31,11 @@ message SongName {
 }
 
 message AddStatus {
+  string NewSongName = 1;
+  string Error = 2;
+}
+
+message DeleteStatus {
   string Error = 1;
 }
 

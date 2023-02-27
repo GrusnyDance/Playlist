@@ -1,19 +1,20 @@
 package entity
 
-import "time"
-
 type Track struct {
-	Duration      time.Duration
+	Duration      int
 	Name          string
-	CurrentOffset uint64
+	CurrentOffset int64
 	Next          *Track
 	Prev          *Track
 }
 
 type Playlist struct {
-	Tracks      []Track
-	LastTrack   *Track
-	NumOfTracks uint
+	Tracks        *Track
+	LastTrack     *Track
+	NumOfTracks   uint
+	CurrentCursor *Track
+	CurrentPlay   *Track
+	IsPlayed      bool
 }
 
 func NewPlaylist() *Playlist {
