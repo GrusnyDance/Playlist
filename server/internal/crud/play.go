@@ -25,6 +25,7 @@ func (s *Server) Play(n *emptypb.Empty, svr pb.Playlist_PlayServer) error {
 	s.PlayList.CurrentCursor = tr
 	s.PlayList.LastTrack = tr
 	s.PlayList.NumOfTracks = 1
+	s.PlayList.IsPlayed = true
 
 	if s.PlayList.IsPlayed && (s.PlayList.CurrentPlay.Name == s.PlayList.CurrentCursor.Name) {
 		return fmt.Errorf("i am played")
@@ -36,9 +37,13 @@ func (s *Server) Play(n *emptypb.Empty, svr pb.Playlist_PlayServer) error {
 
 	curr := s.PlayList.CurrentCursor
 	fmt.Println((*curr).Name)
+OuterLoop:
 	for curr != nil {
+		if !s.PlayList.IsPlayed {
+			break OuterLoop
+		}
+
 		// Open the MP3 file
-		fmt.Println("I see the loop")
 		f, err := os.Open("./tracks/" + curr.Name + ".mp3")
 		fmt.Println(curr.Name)
 		if err != nil {
@@ -57,17 +62,16 @@ func (s *Server) Play(n *emptypb.Empty, svr pb.Playlist_PlayServer) error {
 		// Read and transport audio in chunks
 		buf := make([]byte, chunkSize)
 		for {
-			//fmt.Println("I see internal loop")
+			if !s.PlayList.IsPlayed {
+				break OuterLoop
+			}
 			n, err := mp3Decoder.Read(buf)
-			fmt.Println(buf)
 			if err == io.EOF {
 				break
 			}
 			if n == 0 {
 				break
 			}
-			//fmt.Println(curr.Name)
-			//fmt.Println(buf)
 			svr.Send(&pb.Audio{AudioChunk: buf, ChunkSize: int32(n)})
 			offset, _ := mp3Decoder.Seek(0, io.SeekCurrent)
 			curr.CurrentOffset = offset

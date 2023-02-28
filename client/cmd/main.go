@@ -42,7 +42,7 @@ func main() {
 	if err != nil {
 		fmt.Println("error while playing", err)
 	}
-	internal.PlaySound(&stream)
+	go internal.PlaySound(&stream)
 
 	// usecase 2
 

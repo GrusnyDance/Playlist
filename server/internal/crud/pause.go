@@ -7,5 +7,6 @@ import (
 )
 
 func (s *Server) Pause(context.Context, *emptypb.Empty) (*pb.PauseStatus, error) {
-	return &pb.PauseStatus{Error: "i am play"}, nil
+	s.PlayList.IsPlayed = false
+	return &pb.PauseStatus{Error: "am fine"}, nil
 }
