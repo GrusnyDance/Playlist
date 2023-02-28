@@ -20,6 +20,7 @@ func Send(filename string) {
 
 	// Create MP3 decoder
 	mp3Decoder, err := mp3.NewDecoder(f)
+	fmt.Println("len is", mp3Decoder.Length())
 	if err != nil {
 		panic(err)
 	}

@@ -6,7 +6,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"os"
+	"os/signal"
+	"playlist/client/internal"
 	pb "playlist/proto"
+	"syscall"
 )
 
 func main() {
@@ -31,14 +36,23 @@ func main() {
 	//// usecase 1
 
 	// usecase 2
-	sn := &pb.SongName{
-		Name: "перезаряжай",
-	}
-	response, err := client.AddSong(context.Background(), sn)
+	empty := &emptypb.Empty{}
+	//_, err = client.Play(context.Background(), empty, grpc.StreamInterceptor(NewClientStreamInterceptor()))
+	stream, err := client.Play(context.Background(), empty)
 	if err != nil {
-		grpclog.Fatalf("fail to dial: %v", err)
+		fmt.Println("error while playing", err)
 	}
+	internal.PlaySound(&stream)
+
 	// usecase 2
 
-	fmt.Println(response.Error, "error is")
+	_, cancel := context.WithCancel(context.Background())
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case <-interrupt:
+		// сначала вызвать паузу
+		cancel()
+	}
 }
