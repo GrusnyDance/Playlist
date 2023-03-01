@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../GolandProjects/hflabs-docs/.idea/hflabs-docs.iml" filepath="$PROJECT_DIR$/../GolandProjects/hflabs-docs/.idea/hflabs-docs.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../ozon_hh/.idea/ozon_hh.iml" filepath="$PROJECT_DIR$/../ozon_hh/.idea/ozon_hh.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/playlist.iml" filepath="$PROJECT_DIR$/.idea/playlist.iml" />
     </modules>
   </component>

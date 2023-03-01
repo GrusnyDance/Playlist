@@ -1,5 +1,7 @@
 package playlist
 
+import "sync"
+
 type Track struct {
 	Duration      int
 	Name          string
@@ -14,8 +16,8 @@ type Playlist struct {
 	NumOfTracks   uint
 	CurrentCursor *Track
 	CurrentPlay   *Track
-	IsPlayed      bool
-	// добавить мьютекс для паузы
+	sync.Mutex
+	IsPlayed bool
 }
 
 func NewPlaylist() *Playlist {

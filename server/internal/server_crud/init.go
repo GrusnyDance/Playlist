@@ -1,4 +1,4 @@
-package crud
+package server_crud
 
 import (
 	"context"
@@ -7,7 +7,8 @@ import (
 	"log"
 	"os"
 	pb "playlist/proto"
-	"playlist/server/playlist"
+	"playlist/server/internal/playlist"
+	"playlist/server/internal/storage/repository"
 )
 
 // Server implements gRPC server
@@ -15,7 +16,7 @@ type Server struct {
 	pb.UnimplementedPlaylistServer
 	PlayList       *playlist.Playlist
 	YoutubeService *youtube.Service
-	DbInstance *
+	DbInstance     *repository.Instance
 }
 
 // NewServer is a constructor for Server
@@ -31,12 +32,12 @@ func NewServer() (*Server, error) {
 	if err != nil {
 		log.Println(err)
 	}
-	defer pool.Close()  // переложить в функционал инстанс и закрывать в мейне
+	defer pool.Close() // переложить в функционал инстанс и закрывать в мейне
 	instance := repository.Instance{Db: pool}
 
 	return &Server{
 		PlayList:       playlist.NewPlaylist(),
 		YoutubeService: youtubeService,
-		DbInstance:     instance,
+		DbInstance:     &instance,
 	}, nil
 }

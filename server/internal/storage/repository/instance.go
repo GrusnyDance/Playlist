@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"os"
-	"strings"
 	"time"
 )
 
@@ -19,58 +17,61 @@ type MyTrack struct {
 	Created  time.Time
 	Name     string
 	Duration int64
-	Offset   int64
 }
 
-func (i *Instance) GetAll(mapVac *map[string]string) (*map[string]string, bool) {
-	mapRet := make(map[string]string)
+func (i *Instance) GetAll() ([]*MyTrack, error) {
+	var tracks []*MyTrack
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
+	defer cancel()
+
+	rows, err := i.Db.Query(ctx, "SELECT * FROM mytracks ORDER BY 1;")
+	if err == pgx.ErrNoRows {
+		return nil, fmt.Errorf("no rows")
+	} else if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		t := MyTrack{}
+		rows.Scan(&t.Id, &t.Created, &t.Name, &t.Duration)
+		tracks = append(tracks, &t)
+	}
+	return tracks, nil
+}
+
+func (i *Instance) GetTotalNum() (int, error) {
+	var total int
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
 
-	for key, val := range *mapVac {
-		row := i.Db.QueryRow(ctx, "SELECT id FROM vacancies WHERE name = $1;", key)
-		// Query возвращает структуру pgx.Row
+	row := i.Db.QueryRow(ctx, "SELECT COUNT(*) FROM mytracks;")
+	// Query возвращает структуру pgx.Row
 
-		vac := &Vacancy{}
-		if err := row.Scan(&vac.Id); err == pgx.ErrNoRows {
-			mapRet[key] = val
-			i.InsertVac(key, val)
-		}
+	if err := row.Scan(&total); err == pgx.ErrNoRows {
+		return 0, fmt.Errorf("no rows yet")
 	}
-
-	if len(mapRet) > 0 {
-		return &mapRet, true
-	} else {
-		return nil, false
-	}
+	return total, nil
 }
 
-func (i *Instance) Insert(name string, url string) {
-	fmt.Println("I am trying to insert")
-	trimFactor := os.Getenv("OZON_TRIM")
-	url = strings.TrimLeft(url, trimFactor)
+func (i *Instance) Insert(name string, duration int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
 
-	_, err := i.Db.Exec(ctx, "INSERT INTO vacancies (created_at, name, link) VALUES ($1, $2, $3);",
-		time.Now(), name, url)
+	_, err := i.Db.Exec(ctx, "INSERT INTO tracks (created_at, name, duration) VALUES ($1, $2, $3);",
+		time.Now(), name, duration)
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println(name, url)
+		return err
 	}
+	return nil
 }
 
-func (i *Instance) Delete(name string, url string) {
-	fmt.Println("I am trying to insert")
-	trimFactor := os.Getenv("OZON_TRIM")
-	url = strings.TrimLeft(url, trimFactor)
+func (i *Instance) Delete(name string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
 
-	_, err := i.Db.Exec(ctx, "INSERT INTO vacancies (created_at, name, link) VALUES ($1, $2, $3);",
-		time.Now(), name, url)
+	_, err := i.Db.Exec(ctx, "DELETE FROM tracks WHERE name = $1;", name)
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println(name, url)
+		return err
 	}
+	return nil
 }

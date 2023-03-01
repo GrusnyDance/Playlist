@@ -1,4 +1,4 @@
-package crud
+package server_crud
 
 import (
 	"context"

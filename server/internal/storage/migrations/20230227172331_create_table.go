@@ -15,8 +15,7 @@ func upCreateTable(tx *sql.Tx) error {
     				id bigserial CONSTRAINT mytracks_pk PRIMARY KEY,
     				created_at TIMESTAMP,
     				name VARCHAR,
-    				duration INTEGER,
-    				offset BIGINT
+    				duration INTEGER
 		);
 	`)
 	if err != nil {

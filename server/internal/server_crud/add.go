@@ -1,4 +1,4 @@
-package crud
+package server_crud
 
 import (
 	"context"
@@ -9,23 +9,15 @@ import (
 	"net/http"
 	"os"
 	pb "playlist/proto"
-	"playlist/server/internal/duration"
-	"playlist/server/playlist"
+	"playlist/server/internal/server_crud/duration"
 )
 
 func (s *Server) AddSong(ctx context.Context, in *pb.SongName) (*pb.AddStatus, error) {
-	track := &playlist.Track{
-		Next: nil,
-		Prev: nil,
-	}
-
 	searchResult, title, err := searchVideo(ctx, s.YoutubeService, in.Name)
 	dur, err := duration.GetDuration(searchResult.Id.VideoId)
 	if err != nil {
 		return &pb.AddStatus{Error: "unable to get duration"}, err
 	}
-	track.Duration = dur
-	track.Name = title
 
 	link, err := getAudioLink(searchResult.Id.VideoId)
 	if err != nil {
@@ -36,17 +28,10 @@ func (s *Server) AddSong(ctx context.Context, in *pb.SongName) (*pb.AddStatus, e
 		return &pb.AddStatus{Error: "unable to download audiofile"}, err
 	}
 
-	s.PlayList.NumOfTracks++
-	if s.PlayList.NumOfTracks > 1 {
-		track.Prev = s.PlayList.LastTrack
-		s.PlayList.LastTrack.Next = track
-	} else {
-		s.PlayList.CurrentCursor = track
-	}
-	s.PlayList.LastTrack = track
-	// все что происходит в плейлистом вынести в отдельную папку
+	s.PlayList.Add(title, dur)
+	s.DbInstance.Insert(title, dur)
 
-	return &pb.AddStatus{Error: "no errors", NewSongName: track.Name}, nil
+	return &pb.AddStatus{Error: "no errors", NewSongName: title}, nil
 }
 
 func downloadAudio(link, title string) error {
@@ -70,7 +55,7 @@ func downloadAudio(link, title string) error {
 }
 
 func searchVideo(ctx context.Context, youtubeService *youtube.Service, query string) (*youtube.SearchResult, string, error) {
-	searchCall := youtubeService.Search.List("snippet").
+	searchCall := youtubeService.Search.List([]string{"snippet", "id"}).
 		Q(query).
 		Order("relevance").
 		Order("viewCount").

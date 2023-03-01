@@ -1,0 +1,2 @@
+current_cursor=Три дня дождя — Перезаряжай.mp3
+current_offset=0

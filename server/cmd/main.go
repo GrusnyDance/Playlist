@@ -7,7 +7,8 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"net"
 	pb "playlist/proto"
-	"playlist/server/internal/crud"
+	"playlist/server/internal/server_crud"
+	"playlist/server/internal/storage_playlist_controller"
 )
 
 func main() {
@@ -24,10 +25,11 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	svr, err := crud.NewServer()
+	svr, err := server_crud.NewServer()
 	if err != nil {
 		grpclog.Fatal(err)
 	}
+	storage_playlist_controller.LoadFromDbToPlaylist(svr)
 	pb.RegisterPlaylistServer(grpcServer, svr)
 	grpcServer.Serve(listener)
 }

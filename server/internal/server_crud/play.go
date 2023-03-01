@@ -1,4 +1,4 @@
-package crud
+package server_crud
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 	pb "playlist/proto"
-	"playlist/server/playlist"
+	"playlist/server/internal/playlist"
 )
 
 const chunkSize = 4096
@@ -25,7 +25,7 @@ func (s *Server) Play(n *emptypb.Empty, svr pb.Playlist_PlayServer) error {
 	s.PlayList.CurrentCursor = tr
 	s.PlayList.LastTrack = tr
 	s.PlayList.NumOfTracks = 1
-	s.PlayList.IsPlayed = true
+	s.PlayList.IsPlayed = true // тупа мок
 
 	if s.PlayList.IsPlayed && (s.PlayList.CurrentPlay.Name == s.PlayList.CurrentCursor.Name) {
 		return fmt.Errorf("i am played")
