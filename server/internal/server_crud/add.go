@@ -55,7 +55,7 @@ func downloadAudio(link, title string) error {
 }
 
 func searchVideo(ctx context.Context, youtubeService *youtube.Service, query string) (*youtube.SearchResult, string, error) {
-	searchCall := youtubeService.Search.List([]string{"snippet", "id"}).
+	searchCall := youtubeService.Search.List([]string{"snippet"}).
 		Q(query).
 		Order("relevance").
 		Order("viewCount").

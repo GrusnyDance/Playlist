@@ -1,7 +1,5 @@
 storage:
   host: localhost
-  port: 8080
-  username: ***
-  password: ***
+  port: 5432
   dbname: tracks_db
-  timeout: 30
+  timeout: 5

@@ -32,7 +32,7 @@ func NewServer() (*Server, error) {
 	if err != nil {
 		log.Println(err)
 	}
-	defer pool.Close() // переложить в функционал инстанс и закрывать в мейне
+
 	instance := repository.Instance{Db: pool}
 
 	return &Server{

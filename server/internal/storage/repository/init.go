@@ -34,7 +34,7 @@ func InitRep() (*pgxpool.Pool, error) {
 	// применить миграции через стандартный драйвер database/sql
 	mdb, err := sql.Open("postgres", poolConfig.ConnString())
 	err = mdb.Ping()
-	err = goose.Up(mdb, "migrations")
+	err = goose.Up(mdb, "./server/internal/storage/migrations")
 	if err != nil {
 		panic(err)
 	}

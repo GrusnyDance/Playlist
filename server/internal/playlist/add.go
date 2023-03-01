@@ -1,6 +1,9 @@
 package playlist
 
 func (p *Playlist) Add(name string, duration int) {
+	p.Lock()
+	defer p.Unlock()
+
 	track := &Track{
 		Next: nil,
 		Prev: nil,

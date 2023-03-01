@@ -29,6 +29,8 @@ func main() {
 	if err != nil {
 		grpclog.Fatal(err)
 	}
+
+	defer svr.DbInstance.Db.Close()
 	storage_playlist_controller.LoadFromDbToPlaylist(svr)
 	pb.RegisterPlaylistServer(grpcServer, svr)
 	grpcServer.Serve(listener)

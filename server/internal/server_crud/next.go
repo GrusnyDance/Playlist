@@ -13,5 +13,6 @@ func (s *Server) Next(context.Context, *emptypb.Empty) (*pb.NextStatus, error) {
 	} else {
 		s.PlayList.CurrentCursor = s.PlayList.CurrentCursor.Next
 	}
+
 	return &pb.NextStatus{Error: "you are on next track"}, nil
 }

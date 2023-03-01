@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"sync"
 	"time"
 )
 
 type Instance struct {
 	Db *pgxpool.Pool
+	sync.Mutex
 }
 
 type MyTrack struct {
@@ -19,16 +21,16 @@ type MyTrack struct {
 	Duration int64
 }
 
-func (i *Instance) GetAll() ([]*MyTrack, error) {
+func (i *Instance) GetAll() (slice []*MyTrack, isNoRows bool, e error) {
 	var tracks []*MyTrack
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
 	defer cancel()
 
 	rows, err := i.Db.Query(ctx, "SELECT * FROM mytracks ORDER BY 1;")
 	if err == pgx.ErrNoRows {
-		return nil, fmt.Errorf("no rows")
+		return nil, true, nil
 	} else if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -36,10 +38,10 @@ func (i *Instance) GetAll() ([]*MyTrack, error) {
 		rows.Scan(&t.Id, &t.Created, &t.Name, &t.Duration)
 		tracks = append(tracks, &t)
 	}
-	return tracks, nil
+	return tracks, false, nil
 }
 
-func (i *Instance) GetTotalNum() (int, error) {
+func (i *Instance) GetTotalNum() int {
 	var total int
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
@@ -48,18 +50,23 @@ func (i *Instance) GetTotalNum() (int, error) {
 	// Query возвращает структуру pgx.Row
 
 	if err := row.Scan(&total); err == pgx.ErrNoRows {
-		return 0, fmt.Errorf("no rows yet")
+		return 0
 	}
-	return total, nil
+	return total
 }
 
 func (i *Instance) Insert(name string, duration int) error {
+	fmt.Println("i am insert")
+	i.Lock()
+	defer i.Unlock()
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
 
-	_, err := i.Db.Exec(ctx, "INSERT INTO tracks (created_at, name, duration) VALUES ($1, $2, $3);",
+	_, err := i.Db.Exec(ctx, "INSERT INTO mytracks (created_at, name, duration) VALUES ($1, $2, $3);",
 		time.Now(), name, duration)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	return nil
@@ -69,7 +76,7 @@ func (i *Instance) Delete(name string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
 
-	_, err := i.Db.Exec(ctx, "DELETE FROM tracks WHERE name = $1;", name)
+	_, err := i.Db.Exec(ctx, "DELETE FROM mytracks WHERE name = $1;", name)
 	if err != nil {
 		return err
 	}
