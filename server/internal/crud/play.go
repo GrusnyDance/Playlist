@@ -7,14 +7,14 @@ import (
 	"io"
 	"os"
 	pb "playlist/proto"
-	"playlist/server/entity"
+	"playlist/server/playlist"
 )
 
 const chunkSize = 4096
 
 func (s *Server) Play(n *emptypb.Empty, svr pb.Playlist_PlayServer) error {
 	fmt.Println("hello")
-	tr := &entity.Track{
+	tr := &playlist.Track{
 		Name:          "Три дня дождя — Перезаряжай",
 		Duration:      180,
 		CurrentOffset: 0,

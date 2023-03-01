@@ -6,5 +6,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="hflabs-docs" />
+    <orderEntry type="module" module-name="ozon_hh" />
   </component>
 </module>

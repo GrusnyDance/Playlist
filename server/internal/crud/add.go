@@ -9,12 +9,12 @@ import (
 	"net/http"
 	"os"
 	pb "playlist/proto"
-	"playlist/server/entity"
 	"playlist/server/internal/duration"
+	"playlist/server/playlist"
 )
 
 func (s *Server) AddSong(ctx context.Context, in *pb.SongName) (*pb.AddStatus, error) {
-	track := &entity.Track{
+	track := &playlist.Track{
 		Next: nil,
 		Prev: nil,
 	}
@@ -44,6 +44,7 @@ func (s *Server) AddSong(ctx context.Context, in *pb.SongName) (*pb.AddStatus, e
 		s.PlayList.CurrentCursor = track
 	}
 	s.PlayList.LastTrack = track
+	// все что происходит в плейлистом вынести в отдельную папку
 
 	return &pb.AddStatus{Error: "no errors", NewSongName: track.Name}, nil
 }

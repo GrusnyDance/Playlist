@@ -1,4 +1,4 @@
-package entity
+package playlist
 
 type Track struct {
 	Duration      int
@@ -15,6 +15,7 @@ type Playlist struct {
 	CurrentCursor *Track
 	CurrentPlay   *Track
 	IsPlayed      bool
+	// добавить мьютекс для паузы
 }
 
 func NewPlaylist() *Playlist {

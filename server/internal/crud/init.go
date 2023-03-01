@@ -4,16 +4,18 @@ import (
 	"context"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
+	"log"
 	"os"
 	pb "playlist/proto"
-	"playlist/server/entity"
+	"playlist/server/playlist"
 )
 
 // Server implements gRPC server
 type Server struct {
 	pb.UnimplementedPlaylistServer
-	PlayList       *entity.Playlist
+	PlayList       *playlist.Playlist
 	YoutubeService *youtube.Service
+	DbInstance *
 }
 
 // NewServer is a constructor for Server
@@ -24,8 +26,17 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
+	// пул подключений к базе
+	pool, err := repository.InitRep()
+	if err != nil {
+		log.Println(err)
+	}
+	defer pool.Close()  // переложить в функционал инстанс и закрывать в мейне
+	instance := repository.Instance{Db: pool}
+
 	return &Server{
-		PlayList:       entity.NewPlaylist(),
+		PlayList:       playlist.NewPlaylist(),
 		YoutubeService: youtubeService,
+		DbInstance:     instance,
 	}, nil
 }
