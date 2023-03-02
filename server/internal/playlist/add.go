@@ -19,6 +19,7 @@ func (p *Playlist) Add(name string, duration int) {
 	} else {
 		p.Tracks = track
 		p.CurrentCursor = track
+		p.CurrentPlay = track
 	}
 	p.LastTrack = track
 }

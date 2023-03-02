@@ -1,5 +1,7 @@
 storage:
   host: localhost
   port: 5432
+  username: darika
+  password: australia
   dbname: tracks_db
   timeout: 5

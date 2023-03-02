@@ -42,6 +42,7 @@ OuterLoop:
 			f.Close()
 			continue
 		}
+		mp3Decoder.Seek(curr.CurrentOffset, 0)
 
 		// Read and transport audio in chunks
 		buf := make([]byte, chunkSize)

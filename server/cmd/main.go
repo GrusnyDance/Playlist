@@ -5,10 +5,11 @@ import (
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
+	"log"
 	"net"
 	pb "playlist/proto"
+	"playlist/server/internal/playlist_controller"
 	"playlist/server/internal/server_crud"
-	"playlist/server/internal/storage_playlist_controller"
 )
 
 func main() {
@@ -29,9 +30,13 @@ func main() {
 	if err != nil {
 		grpclog.Fatal(err)
 	}
-
 	defer svr.DbInstance.Db.Close()
-	storage_playlist_controller.LoadFromDbToPlaylist(svr)
+
+	if err = playlist_controller.Start(svr); err != nil {
+		log.Fatal(err)
+	}
+	defer playlist_controller.Finish(svr)
+
 	pb.RegisterPlaylistServer(grpcServer, svr)
 	grpcServer.Serve(listener)
 }
