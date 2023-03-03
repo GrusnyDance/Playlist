@@ -4,6 +4,7 @@ func (p *Playlist) Delete(deletedName string) {
 	if p.CurrentPlay.Name == deletedName && p.IsPlayed {
 		p.Lock()
 		p.IsPlayed = false
+		p.CurrentPlay = nil
 		p.Unlock()
 	}
 

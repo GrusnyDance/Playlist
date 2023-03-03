@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/hajimehoshi/oto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
@@ -24,7 +25,8 @@ func main() {
 	defer conn.Close()
 
 	client := pb.NewPlaylistClient(conn)
-	usecase.New(&client)
+	otoCtx, _ := oto.NewContext(44100, 2, 2, 4096)
+	usecase.New(&client, otoCtx)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)

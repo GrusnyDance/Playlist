@@ -32,6 +32,7 @@ func Finish(srv *server_crud.Server) {
 
 	// Write some content to the file
 	if srv.PlayList.CurrentPlay == nil {
+		fmt.Println("current nil")
 		return
 	}
 	f.WriteString("current_cursor=" + srv.PlayList.CurrentPlay.Name + "\n")

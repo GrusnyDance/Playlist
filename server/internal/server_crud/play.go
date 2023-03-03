@@ -48,18 +48,20 @@ OuterLoop:
 		buf := make([]byte, chunkSize)
 		for {
 			if !s.PlayList.IsPlayed {
+				offset, _ := mp3Decoder.Seek(0, io.SeekCurrent)
+				curr.CurrentOffset = offset
 				break OuterLoop
 			}
-			n, err := mp3Decoder.Read(buf)
-			if err == io.EOF {
+			n1, err1 := mp3Decoder.Read(buf)
+			if err1 == io.EOF {
+				fmt.Println("EOF")
 				break
 			}
-			if n == 0 {
+			if n1 == 0 {
+				fmt.Println("n1 0")
 				break
 			}
-			svr.Send(&pb.Audio{AudioChunk: buf, ChunkSize: int32(n)})
-			offset, _ := mp3Decoder.Seek(0, io.SeekCurrent)
-			curr.CurrentOffset = offset
+			svr.Send(&pb.Audio{AudioChunk: buf, ChunkSize: int32(n1)})
 		}
 		f.Close()
 		curr.CurrentOffset = 0
