@@ -1,7 +1,7 @@
 storage:
   host: localhost
-  port: 8888
-  username: postgres
+  port: 5432
+  username: darika
   password: 123
   dbname: tracks_db
   timeout: 5
