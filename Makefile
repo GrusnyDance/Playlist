@@ -19,9 +19,5 @@ docker-test-client:
 	docker run --privileged client
 
 docker-test-server:
-	docker build -t --no-cache server -f DockerfileServer .
+	docker build --no-cache -t server -f DockerfileServer .
 	docker run --privileged server
-
-docker-test:
-	docker build -t all .
-	docker run --privileged all

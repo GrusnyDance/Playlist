@@ -46,7 +46,7 @@ func NewPoolConfig() (*pgxpool.Config, error) {
 		"postgres",
 		url.QueryEscape(config.Storage.Username),
 		url.QueryEscape(config.Storage.Password),
-		config.Storage.Host,
+		os.Getenv("DB_HOST"),
 		config.Storage.Port,
 		config.Storage.DbName,
 		timeout)

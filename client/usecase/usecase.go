@@ -23,6 +23,8 @@ func New(client *pb.PlaylistClient, otoCtx *oto.Context) {
 	//	}(i)
 	//}
 
+	time.Sleep(time.Second * 10)
+
 	sn := &pb.SongName{
 		Name: "Валерий Меладзе - Иностранец",
 	}

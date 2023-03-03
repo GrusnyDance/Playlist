@@ -60,6 +60,8 @@ func (i *Instance) Insert(name string, duration int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
 
+	fmt.Println(name, duration)
+
 	i.Lock()
 	_, err := i.Db.Exec(ctx, "INSERT INTO mytracks (created_at, name, duration) VALUES ($1, $2, $3);",
 		time.Now(), name, duration)

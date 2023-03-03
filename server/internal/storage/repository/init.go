@@ -31,7 +31,7 @@ func InitRep() (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("Ping failed: %v\n", err)
 	}
 
-	// применить миграции через стандартный драйвер database/sql
+	//применить миграции через стандартный драйвер database/sql
 	mdb, err := sql.Open("postgres", poolConfig.ConnString())
 	err = mdb.Ping()
 	err = goose.Up(mdb, "./server/internal/storage/migrations")

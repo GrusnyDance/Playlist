@@ -1,0 +1,2 @@
+current_cursor=Валерий Меладзе - Иностранец
+current_offset=0

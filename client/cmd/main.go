@@ -16,8 +16,10 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial(":9999",
+	conn, err := grpc.Dial(os.Getenv("GRPC_SERVER_ADDRESS")+":9999",
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	fmt.Println(os.Getenv("GRPC_SERVER_ADDRESS"))
 
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)

@@ -2,6 +2,7 @@ package server_crud
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 	"log"
@@ -29,7 +30,9 @@ func NewServer() (*Server, error) {
 
 	// пул подключений к базе
 	pool, err := repository.InitRep()
+	fmt.Println("I am base")
 	if err != nil {
+		fmt.Println(err)
 		log.Println(err)
 	}
 
