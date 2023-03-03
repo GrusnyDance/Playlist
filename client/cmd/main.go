@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:9999",
+	conn, err := grpc.Dial(":9999",
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
@@ -22,7 +23,7 @@ func main() {
 	}
 	flag.Parse()
 
-	listener, err := net.Listen("tcp", "localhost:9999")
+	listener, err := net.Listen("tcp", ":9999")
 
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
@@ -33,6 +34,7 @@ func main() {
 	if err != nil {
 		grpclog.Fatal(err)
 	}
+	fmt.Println("hello here")
 
 	if err = playlist_controller.Start(svr); err != nil {
 		log.Fatal(err)

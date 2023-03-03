@@ -1,0 +1,9 @@
+FROM postgres:latest
+
+ENV POSTGRES_DB tracks_db
+ENV POSTGRES_USER postgres
+ENV POSTGRES_PASSWORD 123
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
+CMD["chown -R postgres:postgres /var/lib/postgresql/13/main"]

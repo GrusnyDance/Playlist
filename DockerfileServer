@@ -1,0 +1,9 @@
+FROM golang:1.18 AS builder
+WORKDIR /build
+
+COPY . .
+
+RUN apt-get update && apt-get install -y libasound2-dev apt-utils
+RUN GOOS=linux GOARCH=amd64 go build -o app ./server/cmd/main.go
+
+CMD ["/build/./app"]

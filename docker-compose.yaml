@@ -2,25 +2,27 @@ version: "3.7"
 services:
   database:
     container_name: "pgdb"
-    image: postgres
-    profiles:
-      - postgres
+    build:
+      context: .
+      dockerfile: DockerfileDb
     restart: always
     environment:
-      - POSTGRES_USER=darika
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
       - POSTGRES_DB=tracks_db
     ports:
-      - "5432:5432"
+      - "8888:5432"
     volumes:
-      - data:/var/lib/postgresql/data
+      - ./data:/var/lib/postgresql/data
   server:
     container_name: "myserver"
     build:
       context: .
-      dockerfile: server/Dockerfile
+      dockerfile: DockerfileServer
+    environment:
+      - DB_HOST=database
     ports:
-      - "6565:6565"
+      - "9999:9999"
     restart: unless-stopped
     tty: true
     depends_on:
@@ -29,12 +31,16 @@ services:
     container_name: "myclient"
     build:
       context: .
-      dockerfile: client/Dockerfile
-    ports:
-      - "7575:7575"
-#      - "8080:8080"
+      dockerfile: DockerfileClient
+    environment:
+      - GRPC_SERVER_ADDRESS=grpc-server:9999
     restart: unless-stopped
+#    ports:
+#      - "9999:9999"
     tty: true
     depends_on:
       - database
-      - myserver
+      - server
+    security_opt:
+      - "no-new-privileges:false"
+
