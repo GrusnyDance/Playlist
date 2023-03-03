@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"os"
 	"os/signal"
 	"playlist/client/usecase"
@@ -24,24 +26,11 @@ func main() {
 	client := pb.NewPlaylistClient(conn)
 	usecase.New(&client)
 
-	//// usecase 2
-	//empty := &emptypb.Empty{}
-	////_, err = client.Play(context.Background(), empty, grpc.StreamInterceptor(NewClientStreamInterceptor()))
-	//stream, err := client.Play(context.Background(), empty)
-	//if err != nil {
-	//	fmt.Println("error while playing", err)
-	//}
-	//go internal.PlaySound(&stream)
-	//
-	//// usecase 2
-
-	_, cancel := context.WithCancel(context.Background())
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
-	select {
-	case <-interrupt:
-		// сначала вызвать паузу
-		cancel()
-	}
+	<-interrupt
+	fmt.Println("i am graceful")
+	empty := &emptypb.Empty{}
+	client.Pause(context.Background(), empty)
 }

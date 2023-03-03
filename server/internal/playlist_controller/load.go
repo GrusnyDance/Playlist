@@ -2,6 +2,7 @@ package playlist_controller
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"playlist/server/internal/server_crud"
 	"strconv"
@@ -9,7 +10,11 @@ import (
 )
 
 func Start(srv *server_crud.Server) error {
+	srv.PlayList.Add("Валерий Меладзе - Иностранец", 248)
+	srv.DbInstance.Insert("Валерий Меладзе - Иностранец", 248)
+
 	if err := LoadFromDbToPlaylist(srv); err != nil {
+		fmt.Println(err)
 		return err
 	}
 	if srv.PlayList.NumOfTracks == 0 {
@@ -21,14 +26,17 @@ func Start(srv *server_crud.Server) error {
 }
 
 func Finish(srv *server_crud.Server) {
-	// Open file for writing, truncating if it already exists
-	file, _ := os.OpenFile("./server/internal/playlist_controller/config.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	defer file.Close()
+	fmt.Println("I finish")
+	f, _ := os.Create("./server/internal/playlist_controller/config.txt")
+	defer f.Close()
 
 	// Write some content to the file
-	file.WriteString("current_cursor=" + srv.PlayList.CurrentPlay.Name + "\n")
+	if srv.PlayList.CurrentPlay == nil {
+		return
+	}
+	f.WriteString("current_cursor=" + srv.PlayList.CurrentPlay.Name + "\n")
 	off := strconv.Itoa(int(srv.PlayList.CurrentPlay.CurrentOffset))
-	file.WriteString("current_offset=" + off + "\n")
+	f.WriteString("current_offset=" + off + "\n")
 }
 
 func LoadFromDbToPlaylist(srv *server_crud.Server) error {
@@ -52,8 +60,18 @@ func setCursor(srv *server_crud.Server) {
 		return
 	}
 
-	file, _ := os.Open("./server/internal/playlist_controller/config.txt")
+	filename := "./server/internal/playlist_controller/config.txt"
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		os.Create(filename)
+		return
+	}
+
+	file, _ := os.Open(filename)
 	defer file.Close()
+	fi, _ := file.Stat()
+	if fi.Size() == 0 {
+		return
+	}
 
 	// Create a new scanner and set the split function
 	scanner := bufio.NewScanner(file)

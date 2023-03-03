@@ -21,10 +21,12 @@ func (s *Server) AddSong(ctx context.Context, in *pb.SongName) (*pb.AddStatus, e
 
 	link, err := getAudioLink(searchResult.Id.VideoId)
 	if err != nil {
+		fmt.Println(err)
 		return &pb.AddStatus{Error: "unable to get audio from youtube"}, err
 	}
 	err = downloadAudio(link, title)
 	if err != nil {
+		fmt.Println(err)
 		return &pb.AddStatus{Error: "unable to download audiofile"}, err
 	}
 

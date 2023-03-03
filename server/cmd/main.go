@@ -7,9 +7,12 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	pb "playlist/proto"
 	"playlist/server/internal/playlist_controller"
 	"playlist/server/internal/server_crud"
+	"syscall"
 )
 
 func main() {
@@ -30,13 +33,20 @@ func main() {
 	if err != nil {
 		grpclog.Fatal(err)
 	}
-	defer svr.DbInstance.Db.Close()
 
 	if err = playlist_controller.Start(svr); err != nil {
 		log.Fatal(err)
 	}
-	defer playlist_controller.Finish(svr)
 
 	pb.RegisterPlaylistServer(grpcServer, svr)
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigCh
+		playlist_controller.Finish(svr)
+		svr.DbInstance.Db.Close()
+		os.Exit(0)
+	}()
+
 	grpcServer.Serve(listener)
 }

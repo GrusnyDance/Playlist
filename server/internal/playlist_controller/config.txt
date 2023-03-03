@@ -1,2 +1,2 @@
-current_cursor=Три дня дождя — Перезаряжай.mp3
-current_offset=0
+current_cursor=Валерий Меладзе - Иностранец
+current_offset=3041280

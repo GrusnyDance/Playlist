@@ -5,12 +5,11 @@ func (p *Playlist) Add(name string, duration int) {
 	defer p.Unlock()
 
 	track := &Track{
-		Next: nil,
-		Prev: nil,
+		Next:     nil,
+		Prev:     nil,
+		Duration: duration,
+		Name:     name,
 	}
-
-	track.Duration = duration
-	track.Name = name
 
 	p.NumOfTracks++
 	if p.NumOfTracks > 1 {

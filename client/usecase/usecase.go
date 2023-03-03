@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"playlist/client/internal"
@@ -10,31 +9,31 @@ import (
 )
 
 func New(client *pb.PlaylistClient) {
-	for i := 0; i < 5; i++ {
-		go func(j int) {
-			sn := &pb.SongName{
-				Name: "валерий меладзе в первый день весны",
-			}
-			response, err := (*client).AddSong(context.Background(), sn)
-			if err != nil {
-				grpclog.Fatalf("fail to add: %v", response)
-			}
-		}(i)
-	}
+	//for i := 0; i < 5; i++ {
+	//	go func(j int) {
+	//		sn := &pb.SongName{
+	//			Name: "валерий меладзе в первый день весны",
+	//		}
+	//		response, err := (*client).AddSong(context.Background(), sn)
+	//		if err != nil {
+	//			grpclog.Errorf("fail to add: %v", response)
+	//		}
+	//	}(i)
+	//}
 
-	sn := &pb.SongName{
-		Name: "перезаряжай",
-	}
-	response, err := (*client).AddSong(context.Background(), sn)
-	if err != nil {
-		grpclog.Fatalf("fail to add: %v", response)
-	}
+	//sn := &pb.SongName{
+	//	Name: "sinatra",
+	//}
+	//response, err := (*client).AddSong(context.Background(), sn)
+	//if err != nil {
+	//	grpclog.Errorf("fail to add: %v", response)
+	//}
 
 	empty := &emptypb.Empty{}
 	stream, err := (*client).Play(context.Background(), empty)
 	if err != nil {
-		fmt.Println("error while playing", err)
+		grpclog.Errorf("error while playing %v", err)
+	} else {
+		go internal.PlaySound(&stream)
 	}
-	go internal.PlaySound(&stream)
-
 }
