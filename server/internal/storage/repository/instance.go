@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"sync"
 	"time"
 )
 
 type Instance struct {
 	Db *pgxpool.Pool
-	sync.Mutex
 }
 
 type MyTrack struct {
@@ -60,10 +58,8 @@ func (i *Instance) Insert(name string, duration int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
 	defer cancel()
 
-	i.Lock()
 	_, err := i.Db.Exec(ctx, "INSERT INTO mytracks (created_at, name, duration) VALUES ($1, $2, $3);",
 		time.Now(), name, duration)
-	i.Unlock()
 	if err != nil {
 		fmt.Println(err)
 		return err
